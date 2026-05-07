@@ -53,6 +53,7 @@ const {
     | 'hiddenClients'
     | 'hideTestRequestButton'
     | 'layout'
+    | 'oauth2RedirectUri'
     | 'orderRequiredPropertiesFirst'
     | 'orderSchemaPropertiesBy'
     | 'persistAuth'
@@ -104,6 +105,7 @@ const securitySchemes = computed(() =>
     options.authentication?.securitySchemes,
     authStore,
     clientDocument?.['x-scalar-navigation']?.name ?? '',
+    options.oauth2RedirectUri,
   ),
 )
 
