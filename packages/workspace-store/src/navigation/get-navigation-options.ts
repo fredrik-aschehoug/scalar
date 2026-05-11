@@ -130,7 +130,7 @@ export const getNavigationOptions = (documentName: string, options?: NavigationO
 
     if (props.type === 'message') {
       if (!props.name) {
-        return `${documentId}/messages`
+        return `${documentId}/message`
       }
 
       return `${documentId}/message/${slugify(props.name, { preserveCase: true })}`
