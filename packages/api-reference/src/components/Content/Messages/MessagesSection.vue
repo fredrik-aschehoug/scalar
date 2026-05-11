@@ -56,10 +56,13 @@ const messageEntries = computed(() => {
 <template>
   <SectionContainer
     v-if="options.layout !== 'classic'"
-    :id="container.id">
+    id="message">
     <Section
       :id="container.id"
-      aria-label="Messages">
+      aria-label="Messages"
+      @intersecting="
+        () => eventBus?.emit('intersecting:nav-item', { id: container.id })
+      ">
       <SectionHeader>
         <SectionHeaderTag :level="2">Messages</SectionHeaderTag>
       </SectionHeader>
