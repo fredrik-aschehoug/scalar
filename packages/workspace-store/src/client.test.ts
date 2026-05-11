@@ -3847,12 +3847,13 @@ describe('create-workspace-store', () => {
       })
       expect(document?.['x-scalar-original-document-hash']).not.toBe('')
       expect(document).not.toHaveProperty('openapi')
-      // AsyncAPI docs now get an x-scalar-navigation tree so the sidebar can
-      // surface components.messages. Empty for this minimal fixture.
+      // AsyncAPI docs now get an x-scalar-navigation tree. The minimal fixture
+      // has no description and no messages, so only the default Introduction
+      // entry appears.
       expect(document?.['x-scalar-navigation']).toMatchObject({
         type: 'document',
         name: 'streetlights',
-        children: [],
+        children: [{ type: 'text', title: 'Introduction' }],
       })
     })
 

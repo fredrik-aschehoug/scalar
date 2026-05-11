@@ -241,6 +241,7 @@ onMounted(() => {
       :container="messagesContainer"
       :document="asyncApiDocument"
       :eventBus
+      :expandedItems
       :options />
 
     <!-- Render plugins at content.end view -->

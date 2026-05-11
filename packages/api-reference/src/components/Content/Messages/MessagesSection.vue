@@ -17,11 +17,13 @@ import Message from './Message.vue'
 
 const MESSAGE_REF_PREFIX = '#/components/messages/'
 
-const { container, document, options } = defineProps<{
+const { container, document, expandedItems, options } = defineProps<{
   /** Navigation container for the AsyncAPI messages, built in the workspace-store. */
   container: TraversedMessages
   /** Active AsyncAPI document. Used to look up the actual message object per nav entry. */
   document: AsyncApiDocument
+  /** Sidebar expand state, keyed by nav entry id. Mirrors the Models render path. */
+  expandedItems: Record<string, boolean>
   eventBus: WorkspaceEventBus
   options: Pick<
     ApiReferenceConfigurationRaw,
@@ -67,7 +69,7 @@ const messageEntries = computed(() => {
         :document
         :eventBus
         :id="entry.id"
-        :isCollapsed="false"
+        :isCollapsed="!expandedItems[entry.id]"
         :message
         :name
         :options />

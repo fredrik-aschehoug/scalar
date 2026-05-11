@@ -34,7 +34,9 @@ const { message, options } = defineProps<{
     ">
     <template #heading>
       <SectionHeaderTag :level="3">
-        {{ message.title ?? message.name ?? name }}
+        <span class="message-heading">
+          {{ message.title ?? message.name ?? name }}
+        </span>
       </SectionHeaderTag>
     </template>
 
@@ -70,6 +72,11 @@ const { message, options } = defineProps<{
 </template>
 
 <style scoped>
+.message-heading {
+  font-family: var(--scalar-font-code);
+  color: var(--scalar-color-1);
+}
+
 .message-meta {
   display: flex;
   align-items: center;

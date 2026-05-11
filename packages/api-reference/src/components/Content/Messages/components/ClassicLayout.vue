@@ -36,7 +36,7 @@ const { eventBus, id, message } = defineProps<{
         :eventBus="eventBus"
         @copyAnchorUrl="() => eventBus?.emit('copy-url:nav-item', { id })">
         <SectionHeaderTag :level="3">
-          <span class="reference-messages-label">
+          <span class="reference-messages-label message-heading">
             {{ message.title ?? message.name ?? name }}
           </span>
         </SectionHeaderTag>
@@ -85,6 +85,11 @@ const { eventBus, id, message } = defineProps<{
 .reference-messages-label {
   display: block;
   font-size: var(--scalar-mini);
+}
+
+.message-heading {
+  font-family: var(--scalar-font-code);
+  color: var(--scalar-color-1);
 }
 
 .message-meta {

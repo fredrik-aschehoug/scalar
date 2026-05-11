@@ -58,7 +58,7 @@ const container: TraversedMessages = {
 describe('MessagesSection', () => {
   it('renders one message per nav entry and uses the entry id as the anchor', () => {
     const wrapper = mount(MessagesSection, {
-      props: { container, document, eventBus, options },
+      props: { container, document, eventBus, expandedItems: {}, options },
     })
 
     expect(wrapper.text()).toContain('Planet Created Event')
@@ -83,7 +83,7 @@ describe('MessagesSection', () => {
     }
 
     const wrapper = mount(MessagesSection, {
-      props: { container: containerWithOrphan, document, eventBus, options },
+      props: { container: containerWithOrphan, document, eventBus, expandedItems: {}, options },
     })
 
     expect(wrapper.text()).not.toContain('Ghost')
