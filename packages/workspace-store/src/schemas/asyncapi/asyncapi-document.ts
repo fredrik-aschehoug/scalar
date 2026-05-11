@@ -1,4 +1,4 @@
-import { intersection, object, optional, string } from '@scalar/validation'
+import { intersection, object, optional, record, string, unknown } from '@scalar/validation'
 
 import { WorkspaceManagedExtensions } from '@/schemas/extensions/document/workspace-managed-extensions'
 import { XScalarIsDirty } from '@/schemas/extensions/document/x-scalar-is-dirty'
@@ -61,6 +61,70 @@ export type AsyncApiExtensions = Partial<{
 }>
 
 /**
+ * Minimal AsyncAPI Message Object.
+ *
+ * MVP shape: just the fields the api-reference renderer surfaces. The real AsyncAPI 3.0
+ * Message Object is much richer (headers, correlationId, schemaFormat, traits, bindings,
+ * examples, tags, externalDocs, ...) — grow as the renderer learns to display them.
+ *
+ * `payload` stays `unknown` because AsyncAPI payloads can be either an inline Schema
+ * Object or a `$ref` to one — the renderer narrows and dereferences manually.
+ */
+export const AsyncApiMessageObject = object(
+  {
+    name: optional(string({ typeComment: 'Machine-friendly name for the message.' })),
+    title: optional(string({ typeComment: 'Human-friendly title for the message.' })),
+    summary: optional(string({ typeComment: 'A short summary of what the message is about.' })),
+    description: optional(
+      string({
+        typeComment: 'A longer description of the message. CommonMark syntax can be used for rich text representation.',
+      }),
+    ),
+    contentType: optional(string({ typeComment: 'The content type to use when encoding/decoding a message payload.' })),
+    payload: optional(
+      unknown({ typeComment: 'Definition of the message payload. May be a Schema Object or a $ref to one.' }),
+    ),
+  },
+  { typeName: 'AsyncApiMessageObject' },
+)
+
+export type AsyncApiMessageObject = {
+  /** Machine-friendly name for the message. */
+  name?: string
+  /** Human-friendly title for the message. */
+  title?: string
+  /** A short summary of what the message is about. */
+  summary?: string
+  /** A longer description of the message. CommonMark syntax can be used for rich text representation. */
+  description?: string
+  /** The content type to use when encoding/decoding a message payload. */
+  contentType?: string
+  /** Definition of the message payload. May be a Schema Object or a $ref to one. */
+  payload?: unknown
+}
+
+/**
+ * AsyncAPI Components Object (MVP subset).
+ *
+ * Only carries `messages` and `schemas` for this slice — that is what the Messages section
+ * needs to render. Channels, operations, servers, parameters, etc. can be added later.
+ */
+export const AsyncApiComponentsObject = object(
+  {
+    messages: optional(record(string(), AsyncApiMessageObject)),
+    schemas: optional(record(string(), unknown())),
+  },
+  { typeName: 'AsyncApiComponentsObject' },
+)
+
+export type AsyncApiComponentsObject = {
+  /** Map of reusable Message Objects keyed by name. */
+  messages?: Record<string, AsyncApiMessageObject>
+  /** Map of reusable Schema Objects keyed by name. The renderer narrows entries as needed. */
+  schemas?: Record<string, unknown>
+}
+
+/**
  * Minimal AsyncAPI Document.
  *
  * MVP shape: the spec version discriminator, the minimal Info Object, and the shared
@@ -75,6 +139,7 @@ export const AsyncApiDocument = intersection(
           typeComment: 'REQUIRED. The AsyncAPI Specification version the document uses (for example "3.0.0").',
         }),
         info: AsyncApiInfoObject,
+        components: optional(AsyncApiComponentsObject),
       },
       { typeName: 'AsyncApiDocumentCore' },
     ),
@@ -97,6 +162,8 @@ export type AsyncApiDocument = {
   asyncapi: string
   /** REQUIRED. Provides metadata about the application. */
   info: AsyncApiInfoObject
+  /** Reusable components: messages, schemas, etc. */
+  components?: AsyncApiComponentsObject
 } & AsyncApiExtensions &
   WorkspaceManagedExtensions &
   XScalarOriginalDocumentHash &

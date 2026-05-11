@@ -67,5 +67,37 @@ describe('asyncapi-document', () => {
 
       expect(validate(AsyncApiDocument, invalidInput)).toBe(false)
     })
+
+    it('parses a document with components.messages', () => {
+      const validInput = {
+        asyncapi: '3.0.0',
+        info: {
+          title: 'Streetlights API',
+          version: '1.0.0',
+        },
+        components: {
+          messages: {
+            LightOn: {
+              name: 'LightOn',
+              title: 'Light On Event',
+              summary: 'A streetlight turned on.',
+              contentType: 'application/json',
+              payload: { $ref: '#/components/schemas/LightEvent' },
+            },
+          },
+          schemas: {
+            LightEvent: {
+              type: 'object',
+              properties: { id: { type: 'string' } },
+            },
+          },
+        },
+        'x-scalar-original-document-hash': '',
+      }
+
+      const result = coerce(AsyncApiDocument, validInput)
+
+      expect(result).toEqual(validInput)
+    })
   })
 })

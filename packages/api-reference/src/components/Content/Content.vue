@@ -13,7 +13,10 @@ import {
 } from '@scalar/workspace-store/request-example'
 import type { XScalarEnvironment } from '@scalar/workspace-store/schemas/extensions/document/x-scalar-environments'
 import type { TraversedEntry as TraversedEntryType } from '@scalar/workspace-store/schemas/navigation'
-import { isOpenApiDocument } from '@scalar/workspace-store/schemas/type-guards'
+import {
+  isAsyncApiDocument,
+  isOpenApiDocument,
+} from '@scalar/workspace-store/schemas/type-guards'
 import type {
   Workspace,
   WorkspaceDocument,
@@ -33,6 +36,8 @@ import {
   firstLazyLoadComplete,
   scheduleInitialLoadComplete,
 } from '@/helpers/lazy-bus'
+
+import MessagesSection from './Messages/MessagesSection.vue'
 
 const {
   document,
@@ -88,6 +93,11 @@ const openApiDocument = computed(() =>
 )
 const openApiClientDocument = computed(() =>
   isOpenApiDocument(clientDocument) ? clientDocument : undefined,
+)
+
+/** Narrows the active document to AsyncAPI, used by the Messages section render. */
+const asyncApiDocument = computed(() =>
+  isAsyncApiDocument(document) ? document : undefined,
 )
 
 /** Computed property to get all OpenAPI extension fields from the root document object */
@@ -211,6 +221,13 @@ onMounted(() => {
       :selectedClient="xScalarDefaultClient"
       :selectedServer>
     </TraversedEntry>
+
+    <!-- AsyncAPI: Messages section. Body-only render for now (no sidebar nav). -->
+    <MessagesSection
+      v-if="asyncApiDocument?.components?.messages"
+      :document="asyncApiDocument"
+      :eventBus
+      :options />
 
     <!-- Render plugins at content.end view -->
     <RenderPlugins
