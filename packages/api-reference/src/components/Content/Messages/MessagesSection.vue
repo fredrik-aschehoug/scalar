@@ -82,7 +82,11 @@ const messageEntries = computed(() => {
     v-else
     aria-label="Messages"
     class="pb-12"
-    :modelValue="true">
+    :modelValue="!!expandedItems[container.id]"
+    @update:modelValue="
+      (value) =>
+        eventBus?.emit('toggle:nav-item', { id: container.id, open: value })
+    ">
     <template #title>
       <SectionHeader :level="2">Messages</SectionHeader>
     </template>
