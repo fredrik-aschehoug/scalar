@@ -14,9 +14,9 @@ const eventBus: WorkspaceEventBus = {
 
 const baseOptions = {
   layout: 'modern' as const,
-  orderRequiredPropertiesFirst: undefined,
-  orderSchemaPropertiesBy: undefined,
-  hideModels: undefined,
+  orderRequiredPropertiesFirst: false,
+  orderSchemaPropertiesBy: 'preserve' as const,
+  hideModels: false,
 }
 
 const documentWithSchema = (schema: Record<string, unknown>): AsyncApiDocument => ({

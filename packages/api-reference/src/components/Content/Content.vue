@@ -100,6 +100,18 @@ const asyncApiDocument = computed(() =>
   isAsyncApiDocument(document) ? document : undefined,
 )
 
+/**
+ * Find the `TraversedMessages` nav entry for the active AsyncAPI document.
+ * The body Messages section is driven by this so sidebar entries and body
+ * anchors share a single source of ids.
+ */
+const messagesContainer = computed(() =>
+  items.find(
+    (entry): entry is TraversedEntryType & { type: 'messages' } =>
+      entry.type === 'messages',
+  ),
+)
+
 /** Computed property to get all OpenAPI extension fields from the root document object */
 const documentExtensions = computed(() => getXKeysFromObject(document))
 
@@ -222,9 +234,11 @@ onMounted(() => {
       :selectedServer>
     </TraversedEntry>
 
-    <!-- AsyncAPI: Messages section. Body-only render for now (no sidebar nav). -->
+    <!-- AsyncAPI: Messages section. Driven by the nav entries built in the
+         workspace-store so sidebar entries and body anchors share ids. -->
     <MessagesSection
-      v-if="asyncApiDocument?.components?.messages"
+      v-if="asyncApiDocument && messagesContainer"
+      :container="messagesContainer"
       :document="asyncApiDocument"
       :eventBus
       :options />

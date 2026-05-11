@@ -2,6 +2,10 @@
 import type { ApiReferenceConfigurationRaw } from '@scalar/types/api-reference'
 import type { WorkspaceEventBus } from '@scalar/workspace-store/events'
 import type { AsyncApiDocument } from '@scalar/workspace-store/schemas/asyncapi/asyncapi-document'
+import type {
+  TraversedMessage,
+  TraversedMessages,
+} from '@scalar/workspace-store/schemas/navigation'
 import { computed } from 'vue'
 
 import { Section, SectionHeader } from '@/components/Section'
@@ -11,7 +15,12 @@ import SectionHeaderTag from '@/components/Section/SectionHeaderTag.vue'
 
 import Message from './Message.vue'
 
-const { document, options } = defineProps<{
+const MESSAGE_REF_PREFIX = '#/components/messages/'
+
+const { container, document, options } = defineProps<{
+  /** Navigation container for the AsyncAPI messages, built in the workspace-store. */
+  container: TraversedMessages
+  /** Active AsyncAPI document. Used to look up the actual message object per nav entry. */
   document: AsyncApiDocument
   eventBus: WorkspaceEventBus
   options: Pick<
@@ -23,31 +32,41 @@ const { document, options } = defineProps<{
   >
 }>()
 
-/** Stable id used for the section anchor. Sidebar wiring can target this later. */
-const sectionId = 'messages'
+const messageEntries = computed(() => {
+  const entries = (container.children ?? []).filter(
+    (entry): entry is TraversedMessage => entry.type === 'message',
+  )
 
-const messageEntries = computed(() =>
-  Object.entries(document.components?.messages ?? {}),
-)
+  return entries.flatMap((entry) => {
+    const name = entry.ref.startsWith(MESSAGE_REF_PREFIX)
+      ? entry.ref.slice(MESSAGE_REF_PREFIX.length)
+      : entry.name
+    const message = document.components?.messages?.[name]
 
-const messageId = (name: string) => `message/${name}`
+    if (!message) {
+      return []
+    }
+
+    return [{ entry, name, message }]
+  })
+})
 </script>
 <template>
   <SectionContainer
     v-if="options.layout !== 'classic'"
-    :id="sectionId">
+    :id="container.id">
     <Section
-      :id="sectionId"
+      :id="container.id"
       aria-label="Messages">
       <SectionHeader>
         <SectionHeaderTag :level="2">Messages</SectionHeaderTag>
       </SectionHeader>
       <Message
-        v-for="[name, message] in messageEntries"
-        :key="name"
+        v-for="{ entry, name, message } in messageEntries"
+        :key="entry.id"
         :document
         :eventBus
-        :id="messageId(name)"
+        :id="entry.id"
         :isCollapsed="false"
         :message
         :name
@@ -63,11 +82,11 @@ const messageId = (name: string) => `message/${name}`
       <SectionHeader :level="2">Messages</SectionHeader>
     </template>
     <Message
-      v-for="[name, message] in messageEntries"
-      :key="name"
+      v-for="{ entry, name, message } in messageEntries"
+      :key="entry.id"
       :document
       :eventBus
-      :id="messageId(name)"
+      :id="entry.id"
       :isCollapsed="false"
       :message
       :name

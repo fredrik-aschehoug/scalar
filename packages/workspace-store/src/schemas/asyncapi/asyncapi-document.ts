@@ -1,5 +1,6 @@
 import { intersection, object, optional, record, string, unknown } from '@scalar/validation'
 
+import { extensions } from '@/schemas/extensions'
 import { WorkspaceManagedExtensions } from '@/schemas/extensions/document/workspace-managed-extensions'
 import { XScalarIsDirty } from '@/schemas/extensions/document/x-scalar-is-dirty'
 import { XScalarOriginalDocumentHash } from '@/schemas/extensions/document/x-scalar-original-document-hash'
@@ -140,6 +141,7 @@ export const AsyncApiDocument = intersection(
         }),
         info: AsyncApiInfoObject,
         components: optional(AsyncApiComponentsObject),
+        [extensions.document.navigation]: optional(unknown()),
       },
       { typeName: 'AsyncApiDocumentCore' },
     ),
@@ -164,6 +166,12 @@ export type AsyncApiDocument = {
   info: AsyncApiInfoObject
   /** Reusable components: messages, schemas, etc. */
   components?: AsyncApiComponentsObject
+  /**
+   * Workspace-store-built navigation tree. Populated during ingestion. Typed as
+   * `unknown` to keep the runtime schema's `Static<>` inference matching this TS
+   * type; consumers narrow with the shared `TraversedDocument` type at access.
+   */
+  'x-scalar-navigation'?: unknown
 } & AsyncApiExtensions &
   WorkspaceManagedExtensions &
   XScalarOriginalDocumentHash &
