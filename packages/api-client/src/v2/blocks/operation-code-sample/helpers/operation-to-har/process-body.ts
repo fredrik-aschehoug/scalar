@@ -18,11 +18,6 @@ type ProcessBodyProps = Pick<OperationToHarProps, 'contentType' | 'example' | 'r
 
 type MultipartEncodingMap = MediaTypeObject['encoding']
 
-/**
- * Converts an object to an array of form parameters
- * @param obj - The object to convert
- * @returns Array of form parameters with name and value properties
- */
 const objectToFormParams = (
   obj: object | { name: string; value: unknown; isDisabled: boolean }[],
   encoding?: MultipartEncodingMap,
@@ -31,8 +26,8 @@ const objectToFormParams = (
   const params: Param[] = []
 
   /** Ensure we do not include disabled items */
-  const entries = Array.isArray(obj)
-    ? obj.filter((item) => !item.isDisabled).map((item) => [item.name, item.value])
+  const entries: [string, unknown][] = Array.isArray(obj)
+    ? obj.filter((item) => !item.isDisabled).map((item) => [String(item.name), item.value] as [string, unknown])
     : Object.entries(obj)
 
   for (const [key, value] of entries) {
