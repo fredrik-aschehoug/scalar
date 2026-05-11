@@ -34,7 +34,9 @@ describe('traverseAsyncDocument', () => {
     const intro = nav.children?.[0]
     expect(intro?.title).toBe('Introduction')
     expect(intro?.type).toBe('text')
-    expect('children' in (intro ?? {}) ? intro?.children : undefined).toEqual([
+    // Narrow to TraversedDescription so `children` resolves on the union.
+    const introChildren = intro && intro.type === 'text' ? intro.children : undefined
+    expect(introChildren).toEqual([
       { id: expect.any(String), title: 'Event-Driven Features', type: 'text', children: [] },
       { id: expect.any(String), title: 'Resources', type: 'text', children: [] },
     ])
