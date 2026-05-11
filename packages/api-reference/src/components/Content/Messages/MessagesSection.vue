@@ -55,7 +55,7 @@ const messageEntries = computed(() => {
 </script>
 <template>
   <SectionContainer
-    v-if="options.layout !== 'classic'"
+    v-if="options.layout === 'modern'"
     id="message">
     <Section
       :id="container.id"
