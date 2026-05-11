@@ -25,6 +25,7 @@ const { eventBus, id, message } = defineProps<{
 </script>
 <template>
   <SectionAccordion
+    :id="id"
     :aria-label="message.title ?? message.name ?? name"
     :modelValue="!isCollapsed"
     @update:modelValue="
